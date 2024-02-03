@@ -7,3 +7,8 @@ export const currencyFormatter = (amount: number | null) =>
       style: 'currency',
       currency: 'INR',
    }).format(amount ?? 0)
+
+const URL_REGEX =
+   /^(?:(https?:\/\/)?(?:www\.)?)?([\w-]+(\.[\w-]+)+\/?)([^\s]*)$/
+
+export const isURL = (input: string) => URL_REGEX.test(input)

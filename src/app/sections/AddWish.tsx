@@ -12,12 +12,14 @@ import {
    Rating,
    SegmentedControl,
    Stack,
+   TextInput,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { DateInput } from '@mantine/dates'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 
+import { isURL } from '@/utils'
 import { addWish } from '@/queries'
 
 const AddWish = () => {
@@ -46,7 +48,13 @@ const AddWish = () => {
 
 export default AddWish
 
-const Form = ({ onSave }: { onSave: () => void }) => {
+const Form = ({
+   onSave,
+   operation = 'INSERT',
+}: {
+   onSave: () => void
+   operation?: 'INSERT' | 'UPDATE'
+}) => {
    const queryClient = useQueryClient()
    const { mutate } = useMutation({
       mutationFn: addWish,
@@ -58,6 +66,7 @@ const Form = ({ onSave }: { onSave: () => void }) => {
       },
       onSuccess: () => {
          queryClient.invalidateQueries('wishes')
+         onSave()
       },
    })
    const form = useForm({
@@ -69,6 +78,11 @@ const Form = ({ onSave }: { onSave: () => void }) => {
          status: 'PENDING',
          purchase_amount: null,
          purchase_date: null,
+      },
+      validateInputOnBlur: true,
+      validate: {
+         title: value => (!value ? 'Please add a title' : null),
+         url: value => (!isURL(value) ? 'Please add a valid url' : null),
       },
       transformValues: (values: Record<string, any>) => ({
          ...values,
@@ -82,22 +96,18 @@ const Form = ({ onSave }: { onSave: () => void }) => {
       }),
    })
    return (
-      <form
-         onSubmit={form.onSubmit(values => {
-            mutate(values)
-            onSave()
-         })}>
+      <form onSubmit={form.onSubmit(values => mutate(values))}>
          <Stack>
             <Stack gap={4}>
                <Input.Label>Title</Input.Label>
-               <Input
+               <TextInput
                   placeholder="Enter the title"
                   {...form.getInputProps('title')}
                />
             </Stack>
             <Stack gap={4}>
                <Input.Label>URL</Input.Label>
-               <Input
+               <TextInput
                   placeholder="Enter the url"
                   {...form.getInputProps('url')}
                />
@@ -119,42 +129,46 @@ const Form = ({ onSave }: { onSave: () => void }) => {
                   {...form.getInputProps('amount')}
                />
             </Stack>
-            <Stack gap={4}>
-               <Input.Label>Status</Input.Label>
-               <SegmentedControl
-                  size="xs"
-                  fullWidth
-                  withItemsBorders={false}
-                  data={[
-                     { label: 'Pending', value: 'PENDING' },
-                     { label: 'Purchased', value: 'PURCHASED' },
-                  ]}
-                  {...form.getInputProps('status')}
-               />
-            </Stack>
-            {form.values.status === 'PURCHASED' && (
+            {operation === 'UPDATE' && (
                <>
                   <Stack gap={4}>
-                     <Input.Label>Purchase Amount</Input.Label>
-                     <NumberInput
-                        min={0}
-                        hideControls
-                        prefix="₹"
-                        decimalScale={2}
-                        allowNegative={false}
-                        thousandSeparator=","
-                        placeholder="Enter the purchase amount"
-                        {...form.getInputProps('purchase_amount')}
+                     <Input.Label>Status</Input.Label>
+                     <SegmentedControl
+                        size="xs"
+                        fullWidth
+                        withItemsBorders={false}
+                        data={[
+                           { label: 'Pending', value: 'PENDING' },
+                           { label: 'Purchased', value: 'PURCHASED' },
+                        ]}
+                        {...form.getInputProps('status')}
                      />
                   </Stack>
-                  <Stack gap={4}>
-                     <Input.Label>Purchase Date</Input.Label>
-                     <DateInput
-                        valueFormat="MMM DD, YYYY"
-                        placeholder="Enter the purchase date"
-                        {...form.getInputProps('purchase_date')}
-                     />
-                  </Stack>
+                  {form.values.status === 'PURCHASED' && (
+                     <>
+                        <Stack gap={4}>
+                           <Input.Label>Purchase Amount</Input.Label>
+                           <NumberInput
+                              min={0}
+                              hideControls
+                              prefix="₹"
+                              decimalScale={2}
+                              allowNegative={false}
+                              thousandSeparator=","
+                              placeholder="Enter the purchase amount"
+                              {...form.getInputProps('purchase_amount')}
+                           />
+                        </Stack>
+                        <Stack gap={4}>
+                           <Input.Label>Purchase Date</Input.Label>
+                           <DateInput
+                              valueFormat="MMM DD, YYYY"
+                              placeholder="Enter the purchase date"
+                              {...form.getInputProps('purchase_date')}
+                           />
+                        </Stack>
+                     </>
+                  )}
                </>
             )}
          </Stack>
