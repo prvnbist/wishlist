@@ -1,0 +1,12 @@
+td,
+th {
+   height: 28px;
+   font-size: 13px;
+   white-space: nowrap;
+   padding-top: 0 !important;
+   padding-bottom: 0 !important;
+}
+
+table {
+   table-layout: fixed;
+}
