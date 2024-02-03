@@ -15,6 +15,7 @@ import {
 
 import '../styles/global.css'
 import '@mantine/core/styles.css'
+import '@mantine/dates/styles.css'
 import '@mantine/notifications/styles.css'
 
 import classes from './layout.module.css'

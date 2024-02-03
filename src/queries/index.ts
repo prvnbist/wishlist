@@ -2,9 +2,9 @@ import axios, { AxiosError } from 'axios'
 
 import { Sort } from '@/types'
 
-export const getList = async (sort: Sort[], search: string = '') => {
+export const wishes = async (sort: Sort[], search: string = '') => {
    try {
-      const data = await axios.get('/api/list', {
+      const data = await axios.get('/api/wishes', {
          params: {
             ...(search.trim() && { search: search.trim() }),
             ...sort.reduce((acc: { [key in string]: 'asc' | 'desc' }, curr) => {
@@ -15,6 +15,17 @@ export const getList = async (sort: Sort[], search: string = '') => {
       })
 
       return data.data.list
+   } catch (error) {
+      const _error = (error as AxiosError)?.response?.statusText
+      throw Error(_error)
+   }
+}
+
+export const addWish = async (values: any) => {
+   try {
+      const data = await axios.post('/api/wishes', values)
+
+      return data
    } catch (error) {
       const _error = (error as AxiosError)?.response?.statusText
       throw Error(_error)

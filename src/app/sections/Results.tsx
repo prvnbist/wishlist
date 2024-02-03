@@ -41,19 +41,6 @@ const COLUMNS = [
          )
       },
    }),
-   columnHelper.accessor('date', {
-      size: 110,
-      header: () => (
-         <Text size="xs" ta="right">
-            Date
-         </Text>
-      ),
-      cell: props => (
-         <Text size="xs" ta="right">
-            {props.getValue()}
-         </Text>
-      ),
-   }),
    columnHelper.accessor('rating', {
       size: 100,
       header: () => (

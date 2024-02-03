@@ -6,17 +6,17 @@ import { useQuery } from 'react-query'
 import { notifications } from '@mantine/notifications'
 import { Center, Container, Group, Loader } from '@mantine/core'
 
-import { getList } from '@/queries'
+import { wishes } from '@/queries'
 import useGlobalStore from '@/lib/zustand'
 
-import { AddSort, Results, Search, Sorts } from './sections'
+import { AddSort, AddWish, Results, Search, Sorts } from './sections'
 
 function Home() {
    const [sort, search] = useGlobalStore(state => [state.sort, state.search])
 
    const query = useQuery(
-      ['list', { sort, search }],
-      () => getList(sort, search),
+      ['wishes', { sort, search }],
+      () => wishes(sort, search),
       {
          retry: 0,
          onError: error => {
@@ -31,6 +31,7 @@ function Home() {
    return (
       <Container size="xl" mt={16} pt={16}>
          <Group>
+            <AddWish />
             <AddSort />
             <Search />
          </Group>

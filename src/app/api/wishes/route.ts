@@ -1,5 +1,23 @@
 import supabase from '@/lib/supabase'
 
+export async function POST(request: Request) {
+   const body = await request.json()
+
+   const { data, error } = await supabase
+      .from('wishlist')
+      .insert([body])
+      .select()
+
+   if (error) {
+      return Response.json(null, {
+         status: 500,
+         statusText: 'Unable to save the wish, please try agian!',
+      })
+   }
+
+   return Response.json({ data })
+}
+
 export async function GET(request: Request) {
    const urlParams = new URLSearchParams(new URL(request.url).search)
 
@@ -23,7 +41,7 @@ export async function GET(request: Request) {
    if (response.error?.code) {
       return Response.json(null, {
          status: 500,
-         statusText: 'Something went wrong, please try again!',
+         statusText: 'Unable to fetch the wishes, please try again!',
       })
    }
 
