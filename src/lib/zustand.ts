@@ -4,11 +4,15 @@ import type { Sort, WishListItem } from '@/types'
 
 interface GlobalState {
    sort: Sort[]
+   search: string
+   setSearch: (search: string) => void
    setSort: (value: Sort, op: 'add' | 'remove') => void
 }
 
 const useGlobalStore = create<GlobalState>(set => ({
    sort: [],
+   search: '',
+   setSearch: (search: string) => set(() => ({ search })),
    setSort: (value: Sort, op: 'add' | 'remove') =>
       set(state => {
          if (op === 'add') {

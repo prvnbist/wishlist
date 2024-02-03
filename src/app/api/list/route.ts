@@ -7,7 +7,14 @@ export async function GET(request: Request) {
 
    const query = supabase.from('wishlist').select('*')
 
+   const search = urlParams.get('search')
+
+   if (search) {
+      query.or(`title.ilike.%${search.trim()}%,domain.ilike.%${search.trim()}%`)
+   }
+
    params.forEach(([key, value]) => {
+      if (key === 'search') return
       query.order(key, { ascending: value === 'asc' })
    })
 
