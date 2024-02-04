@@ -10,3 +10,45 @@ th {
 table {
    table-layout: fixed;
 }
+
+th.sticky,
+td.sticky {
+   position: sticky;
+   right: 0;
+   content: '';
+   z-index: 10;
+}
+
+td.sticky.sticky_even {
+   background-color: var(--_table-striped-color);
+}
+
+th.sticky,
+td.sticky.sticky_odd {
+   background-color: var(--mantine-color-body);
+}
+
+th.sticky::after,
+th.sticky::before,
+td.sticky::after,
+td.sticky::before {
+   top: 0;
+   content: '';
+   height: 100%;
+   z-index: 10;
+   position: absolute;
+}
+
+th.sticky::before,
+td.sticky::before {
+   left: -1px;
+   border-left: calc(0.0625rem * var(--mantine-scale)) solid
+      var(--_table-border-color);
+}
+
+th.sticky::after,
+td.sticky::after {
+   right: -1px;
+   border-right: calc(0.0625rem * var(--mantine-scale)) solid
+      var(--_table-border-color);
+}

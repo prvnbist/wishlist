@@ -31,3 +31,16 @@ export const addWish = async (values: any) => {
       throw Error(_error)
    }
 }
+
+export const deleteWish = async (id: string) => {
+   try {
+      const data = await axios.delete('/api/wishes', {
+         data: { id },
+      })
+
+      return data
+   } catch (error) {
+      const _error = (error as AxiosError)?.response?.statusText
+      throw Error(_error)
+   }
+}

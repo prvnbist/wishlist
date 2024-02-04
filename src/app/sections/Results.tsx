@@ -1,12 +1,27 @@
+import { useMemo } from 'react'
+import { AxiosError } from 'axios'
+import { IconTrash } from '@tabler/icons-react'
+import { useMutation, useQueryClient } from 'react-query'
 import {
+   Row,
    createColumnHelper,
    flexRender,
    getCoreRowModel,
    useReactTable,
 } from '@tanstack/react-table'
 
-import { Anchor, Badge, Flex, Rating, Table, Text } from '@mantine/core'
+import {
+   ActionIcon,
+   Anchor,
+   Badge,
+   Flex,
+   Rating,
+   Table,
+   Text,
+} from '@mantine/core'
+import { notifications } from '@mantine/notifications'
 
+import { deleteWish } from '@/queries'
 import type { WishListItem } from '@/types'
 import { calculatePercentDifference, currencyFormatter } from '@/utils'
 
@@ -136,10 +151,50 @@ const COLUMNS = [
    }),
 ]
 
+const RowActions = ({ row }: { row: Row<WishListItem> }) => {
+   const queryClient = useQueryClient()
+   const { mutate } = useMutation({
+      mutationFn: deleteWish,
+      onError: error => {
+         notifications.show({
+            title: 'Error',
+            message: (error as AxiosError).message,
+         })
+      },
+      onSuccess: () => {
+         queryClient.invalidateQueries('wishes')
+      },
+   })
+   return (
+      <ActionIcon
+         size="sm"
+         color="gray"
+         variant="subtle"
+         title="Delete Wish"
+         onClick={() => mutate(row.original.id)}>
+         <IconTrash size={14} stroke={2} />
+      </ActionIcon>
+   )
+}
+
+const ActionColumn = columnHelper.display({
+   size: 60,
+   id: 'actions',
+   meta: {
+      className: 'sticky',
+   },
+   cell: props => (
+      <Flex justify="center">
+         <RowActions row={props.row} />
+      </Flex>
+   ),
+})
+
 const Results = ({ data }: { data: WishListItem[] }) => {
+   const columns = useMemo(() => [...COLUMNS, ActionColumn], [])
    const table = useReactTable({
       data,
-      columns: COLUMNS,
+      columns,
       getCoreRowModel: getCoreRowModel(),
    })
    return (
@@ -151,6 +206,7 @@ const Results = ({ data }: { data: WishListItem[] }) => {
                      {headerGroup.headers.map(header => (
                         <Table.Th
                            key={header.id}
+                           className={header.column.columnDef.meta?.className}
                            style={{
                               width:
                                  header.getSize() === 150
@@ -169,23 +225,22 @@ const Results = ({ data }: { data: WishListItem[] }) => {
                ))}
             </Table.Thead>
             <Table.Tbody>
-               {table.getRowModel().rows.map(row => (
+               {table.getRowModel().rows.map((row, index) => (
                   <Table.Tr key={row.id}>
-                     {row.getVisibleCells().map(cell => (
-                        <Table.Td
-                           key={cell.id}
-                           style={{
-                              width:
-                                 cell.column.getSize() === 150
-                                    ? 'auto'
-                                    : cell.column.getSize(),
-                           }}>
-                           {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                           )}
-                        </Table.Td>
-                     ))}
+                     {row.getVisibleCells().map(cell => {
+                        const size = cell.column.getSize()
+                        const columnDef = cell.column.columnDef
+                        return (
+                           <Table.Td
+                              key={cell.id}
+                              className={`${columnDef.meta?.className} ${index % 2 === 0 ? 'sticky_even' : 'sticky_odd'}`}
+                              style={{
+                                 width: size === 150 ? 'auto' : size,
+                              }}>
+                              {flexRender(columnDef.cell, cell.getContext())}
+                           </Table.Td>
+                        )
+                     })}
                   </Table.Tr>
                ))}
             </Table.Tbody>
