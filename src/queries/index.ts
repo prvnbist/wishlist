@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 
 import { Sort } from '@/types'
+import { uploadFile } from '@/actions'
 
 export const wishes = async (sort: Sort[], search: string = '') => {
    try {
@@ -23,7 +24,18 @@ export const wishes = async (sort: Sort[], search: string = '') => {
 
 export const addWish = async (values: any) => {
    try {
-      const data = await axios.post('/api/wishes', values)
+      const { file = null, ...rest } = values
+      const data = await axios.post('/api/wishes', rest)
+
+      if (file) {
+         const id = data.data[0].id
+         const form = new FormData()
+         form.append('file', file)
+         const url = await uploadFile(form, id)
+         if (url) {
+            await axios.put('/api/wishes', { id, image_url: url })
+         }
+      }
 
       return data
    } catch (error) {

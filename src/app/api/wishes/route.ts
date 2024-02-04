@@ -33,7 +33,26 @@ export async function POST(request: Request) {
       })
    }
 
-   return Response.json({ data })
+   return Response.json(data)
+}
+
+export async function PUT(request: Request) {
+   const body = await request.json()
+
+   const { id, ...rest } = body
+   const { data, error } = await supabase
+      .from('wishlist')
+      .update(rest)
+      .eq('id', id)
+
+   if (error) {
+      return Response.json(null, {
+         status: 500,
+         statusText: 'Unable to update the wish, please try again!',
+      })
+   }
+
+   return Response.json(data)
 }
 
 export async function GET(request: Request) {

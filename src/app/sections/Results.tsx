@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { AxiosError } from 'axios'
-import { IconTrash } from '@tabler/icons-react'
+import { IconPhoto, IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from 'react-query'
 import type { HeaderGroup } from '@tanstack/react-table'
 import {
@@ -11,19 +11,21 @@ import {
    useReactTable,
 } from '@tanstack/react-table'
 
+import { modals } from '@mantine/modals'
 import {
    ActionIcon,
    Anchor,
    Badge,
    Flex,
+   Image,
    Rating,
    Table,
    Text,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
 
-import { deleteWish } from '@/queries'
 import type { Wish } from '@/types'
+import { deleteWish } from '@/queries'
 import { calculatePercentDifference, currencyFormatter } from '@/utils'
 
 const columnHelper = createColumnHelper<Wish>()
@@ -37,6 +39,27 @@ const COLUMNS = [
             {props.getValue()}
          </Text>
       ),
+   }),
+   columnHelper.accessor('image_url', {
+      size: 56,
+      header: () => <Text size="xs">Image</Text>,
+      cell: props =>
+         props.getValue() && (
+            <Flex py={2} justify="center">
+               <ActionIcon
+                  size="xs"
+                  variant="subtle"
+                  color="gray"
+                  onClick={() =>
+                     modals.open({
+                        title: 'Image Preview',
+                        children: <Image alt="" src={props.getValue()} />,
+                     })
+                  }>
+                  <IconPhoto size={14} />
+               </ActionIcon>
+            </Flex>
+         ),
    }),
    columnHelper.accessor('url', {
       size: 240,

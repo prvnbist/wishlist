@@ -1,17 +1,30 @@
 import dayjs from 'dayjs'
+import { useState } from 'react'
 import { AxiosError } from 'axios'
-import { IconPlus } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from 'react-query'
+import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone'
+import {
+   IconPhoto,
+   IconPlus,
+   IconTrash,
+   IconUpload,
+   IconX,
+} from '@tabler/icons-react'
 
 import {
+   ActionIcon,
+   Box,
    Button,
    Drawer,
+   Flex,
    Group,
+   Image,
    Input,
    NumberInput,
    Rating,
    SegmentedControl,
    Stack,
+   Text,
    TextInput,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
@@ -48,6 +61,43 @@ const AddWish = () => {
 
 export default AddWish
 
+const DROPZONE_ICON_DIMENSTION = { width: 44, height: 44 }
+const DROPZONE_STATES = {
+   accept: (
+      <Dropzone.Accept>
+         <IconUpload
+            stroke={1.5}
+            style={{
+               ...DROPZONE_ICON_DIMENSTION,
+               color: 'var(--mantine-color-blue-6)',
+            }}
+         />
+      </Dropzone.Accept>
+   ),
+   reject: (
+      <Dropzone.Reject>
+         <IconX
+            stroke={1.5}
+            style={{
+               ...DROPZONE_ICON_DIMENSTION,
+               color: 'var(--mantine-color-red-6)',
+            }}
+         />
+      </Dropzone.Reject>
+   ),
+   idle: (
+      <Dropzone.Idle>
+         <IconPhoto
+            stroke={1.5}
+            style={{
+               ...DROPZONE_ICON_DIMENSTION,
+               color: 'var(--mantine-color-dimmed)',
+            }}
+         />
+      </Dropzone.Idle>
+   ),
+}
+
 const Form = ({
    onSave,
    operation = 'INSERT',
@@ -56,6 +106,22 @@ const Form = ({
    operation?: 'INSERT' | 'UPDATE'
 }) => {
    const queryClient = useQueryClient()
+
+   const [files, setFiles] = useState<FileWithPath[]>([])
+
+   const previews = files.map((file, index) => {
+      const imageUrl = URL.createObjectURL(file)
+      return (
+         <Image
+            key={index}
+            src={imageUrl}
+            alt={file.name}
+            style={{ borderRadius: 4 }}
+            onLoad={() => URL.revokeObjectURL(imageUrl)}
+         />
+      )
+   })
+
    const { mutate } = useMutation({
       mutationFn: addWish,
       onError: error => {
@@ -69,6 +135,7 @@ const Form = ({
          onSave()
       },
    })
+
    const form = useForm({
       initialValues: {
          title: '',
@@ -96,7 +163,10 @@ const Form = ({
       }),
    })
    return (
-      <form onSubmit={form.onSubmit(values => mutate(values))}>
+      <form
+         onSubmit={form.onSubmit(values =>
+            mutate({ ...values, file: files?.[0] })
+         )}>
          <Stack>
             <Stack gap={4}>
                <Input.Label>Title</Input.Label>
@@ -129,6 +199,43 @@ const Form = ({
                   {...form.getInputProps('amount')}
                />
             </Stack>
+            <Stack gap={4}>
+               <Input.Label>Image</Input.Label>
+               <Dropzone
+                  multiple={false}
+                  onDrop={setFiles}
+                  maxSize={5 * 1024 ** 2}
+                  accept={IMAGE_MIME_TYPE}>
+                  <Flex
+                     gap={16}
+                     mih={60}
+                     align="center"
+                     style={{ pointerEvents: 'none' }}>
+                     {DROPZONE_STATES['accept']}
+                     {DROPZONE_STATES['reject']}
+                     {DROPZONE_STATES['idle']}
+                     <Flex direction="column" gap={8}>
+                        <Text size="md" inline>
+                           Drag image here or click to select file
+                        </Text>
+                        <Text size="sm" c="dimmed" inline>
+                           File size should not exceed 5mb.
+                        </Text>
+                     </Flex>
+                  </Flex>
+               </Dropzone>
+            </Stack>
+            {files.length > 0 && (
+               <Group>
+                  <Box w={100}>{previews}</Box>
+                  <ActionIcon
+                     color="gray"
+                     variant="subtle"
+                     onClick={() => setFiles([])}>
+                     <IconTrash size={16} />
+                  </ActionIcon>
+               </Group>
+            )}
             {operation === 'UPDATE' && (
                <>
                   <Stack gap={4}>

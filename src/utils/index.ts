@@ -12,3 +12,10 @@ const URL_REGEX =
    /^(?:(https?:\/\/)?(?:www\.)?)?([\w-]+(\.[\w-]+)+\/?)([^\s]*)$/
 
 export const isURL = (input: string) => URL_REGEX.test(input)
+
+export const getFileExtension = (fileName: string) => {
+   const extensionRegex = /\.([0-9a-z]+)$/i
+   const match = fileName.match(extensionRegex)
+
+   return match ? match[1].toLowerCase() : null
+}

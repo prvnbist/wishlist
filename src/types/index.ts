@@ -6,6 +6,7 @@ export type Wish = {
    amount: number
    rating: number
    domain: string
+   image_url: string | null
    purchase_date: string | null
    purchase_amount: number | null
    status: 'PENDING' | 'PURCHASED'
