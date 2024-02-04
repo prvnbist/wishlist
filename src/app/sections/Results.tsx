@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { AxiosError } from 'axios'
 import { IconTrash } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from 'react-query'
+import type { HeaderGroup } from '@tanstack/react-table'
 import {
    Row,
    createColumnHelper,
@@ -200,53 +201,62 @@ const Results = ({ data }: { data: WishListItem[] }) => {
    return (
       <Table.ScrollContainer minWidth={500} mt={16}>
          <Table layout="fixed" striped withTableBorder withColumnBorders>
-            <Table.Thead>
-               {table.getHeaderGroups().map(headerGroup => (
-                  <Table.Tr key={headerGroup.id}>
-                     {headerGroup.headers.map(header => (
-                        <Table.Th
-                           key={header.id}
-                           className={header.column.columnDef.meta?.className}
-                           style={{
-                              width:
-                                 header.getSize() === 150
-                                    ? 'auto'
-                                    : header.getSize(),
-                           }}>
-                           {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                   header.column.columnDef.header,
-                                   header.getContext()
-                                )}
-                        </Table.Th>
-                     ))}
-                  </Table.Tr>
-               ))}
-            </Table.Thead>
-            <Table.Tbody>
-               {table.getRowModel().rows.map((row, index) => (
-                  <Table.Tr key={row.id}>
-                     {row.getVisibleCells().map(cell => {
-                        const size = cell.column.getSize()
-                        const columnDef = cell.column.columnDef
-                        return (
-                           <Table.Td
-                              key={cell.id}
-                              className={`${columnDef.meta?.className} ${index % 2 === 0 ? 'sticky_even' : 'sticky_odd'}`}
-                              style={{
-                                 width: size === 150 ? 'auto' : size,
-                              }}>
-                              {flexRender(columnDef.cell, cell.getContext())}
-                           </Table.Td>
-                        )
-                     })}
-                  </Table.Tr>
-               ))}
-            </Table.Tbody>
+            <THead headers={table.getHeaderGroups()} />
+            <TBody rows={table.getRowModel().rows} />
          </Table>
       </Table.ScrollContainer>
    )
 }
 
 export default Results
+
+const THead = ({ headers }: { headers: HeaderGroup<WishListItem>[] }) => {
+   const [header] = headers
+   return (
+      <Table.Thead>
+         <Table.Tr>
+            {header.headers.map(header => {
+               const size = header.getSize()
+               return (
+                  <Table.Th
+                     key={header.id}
+                     className={header.column.columnDef.meta?.className}
+                     style={{
+                        width: size === 150 ? 'auto' : size,
+                     }}>
+                     {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                     )}
+                  </Table.Th>
+               )
+            })}
+         </Table.Tr>
+      </Table.Thead>
+   )
+}
+
+const TBody = ({ rows }: { rows: Row<WishListItem>[] }) => {
+   return (
+      <Table.Tbody>
+         {rows.map((row, index) => (
+            <Table.Tr key={row.id}>
+               {row.getVisibleCells().map(cell => {
+                  const size = cell.column.getSize()
+                  const columnDef = cell.column.columnDef
+                  return (
+                     <Table.Td
+                        key={cell.id}
+                        className={`${columnDef.meta?.className} ${index % 2 === 0 ? 'sticky_even' : 'sticky_odd'}`}
+                        style={{
+                           width: size === 150 ? 'auto' : size,
+                        }}>
+                        {flexRender(columnDef.cell, cell.getContext())}
+                     </Table.Td>
+                  )
+               })}
+            </Table.Tr>
+         ))}
+      </Table.Tbody>
+   )
+}
