@@ -13,26 +13,32 @@ import {
    Space,
 } from '@mantine/core'
 
-import type { WishListItem } from '@/types'
+import type { Wish } from '@/types'
 
 import useGlobalStore from '@/lib/zustand'
 
 const AddSort = () => {
    const setSort = useGlobalStore(state => state.setSort)
 
-   const [column, setColumn] = useState<keyof WishListItem | null>(null)
+   const [column, setColumn] = useState<keyof Wish | null>(null)
    const [direction, setDirection] = useState<'asc' | 'desc'>('asc')
 
-   const apply = () => {
-      if (!column) return
-
-      setSort({ column, direction }, 'add')
-
+   const reset = () => {
       setColumn(null)
       setDirection('asc')
    }
+
+   const apply = () => {
+      if (!column) return
+      setSort({ column, direction }, 'add')
+      reset()
+   }
    return (
-      <Popover width={280} shadow="md" position="bottom-start">
+      <Popover
+         width={280}
+         shadow="md"
+         position="bottom-start"
+         onClose={() => reset()}>
          <Popover.Target>
             <Button
                size="xs"
@@ -51,9 +57,8 @@ const AddSort = () => {
                placeholder="Select column"
                nothingFoundMessage="No such column..."
                comboboxProps={{ withinPortal: false }}
-               onChange={value => setColumn(value as keyof WishListItem)}
+               onChange={value => setColumn(value as keyof Wish)}
                data={[
-                  { value: 'date', label: 'Date' },
                   { value: 'rating', label: 'Rating' },
                   { value: 'domain', label: 'Domain' },
                   { value: 'status', label: 'Status' },

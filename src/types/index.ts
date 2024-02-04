@@ -1,4 +1,4 @@
-export type WishListItem = {
+export type Wish = {
    id: string
    title: string
    url: string
@@ -12,6 +12,6 @@ export type WishListItem = {
 }
 
 export interface Sort {
-   column: keyof WishListItem
+   column: keyof Wish
    direction: 'asc' | 'desc'
 }

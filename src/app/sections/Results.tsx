@@ -23,10 +23,10 @@ import {
 import { notifications } from '@mantine/notifications'
 
 import { deleteWish } from '@/queries'
-import type { WishListItem } from '@/types'
+import type { Wish } from '@/types'
 import { calculatePercentDifference, currencyFormatter } from '@/utils'
 
-const columnHelper = createColumnHelper<WishListItem>()
+const columnHelper = createColumnHelper<Wish>()
 
 const COLUMNS = [
    columnHelper.accessor('title', {
@@ -152,7 +152,7 @@ const COLUMNS = [
    }),
 ]
 
-const RowActions = ({ row }: { row: Row<WishListItem> }) => {
+const RowActions = ({ row }: { row: Row<Wish> }) => {
    const queryClient = useQueryClient()
    const { mutate } = useMutation({
       mutationFn: deleteWish,
@@ -191,7 +191,7 @@ const ActionColumn = columnHelper.display({
    ),
 })
 
-const Results = ({ data }: { data: WishListItem[] }) => {
+const Results = ({ data }: { data: Wish[] }) => {
    const columns = useMemo(() => [...COLUMNS, ActionColumn], [])
    const table = useReactTable({
       data,
@@ -210,7 +210,7 @@ const Results = ({ data }: { data: WishListItem[] }) => {
 
 export default Results
 
-const THead = ({ headers }: { headers: HeaderGroup<WishListItem>[] }) => {
+const THead = ({ headers }: { headers: HeaderGroup<Wish>[] }) => {
    const [header] = headers
    return (
       <Table.Thead>
@@ -236,7 +236,7 @@ const THead = ({ headers }: { headers: HeaderGroup<WishListItem>[] }) => {
    )
 }
 
-const TBody = ({ rows }: { rows: Row<WishListItem>[] }) => {
+const TBody = ({ rows }: { rows: Row<Wish>[] }) => {
    return (
       <Table.Tbody>
          {rows.map((row, index) => (

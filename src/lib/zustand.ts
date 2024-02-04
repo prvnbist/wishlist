@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { Sort, WishListItem } from '@/types'
+import type { Sort } from '@/types'
 
 interface GlobalState {
    sort: Sort[]
