@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+   env: {
+      SECRET: process.env.SECRET,
+   },
+}
 
-export default nextConfig;
+export default nextConfig

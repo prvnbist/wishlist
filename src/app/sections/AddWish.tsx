@@ -20,6 +20,7 @@ import {
    Group,
    Image,
    Input,
+   Loader,
    NumberInput,
    Rating,
    SegmentedControl,
@@ -122,7 +123,7 @@ const Form = ({
       )
    })
 
-   const { mutate } = useMutation({
+   const { mutate, isLoading } = useMutation({
       mutationFn: addWish,
       onError: error => {
          notifications.show({
@@ -280,7 +281,14 @@ const Form = ({
             )}
          </Stack>
          <Group justify="flex-end" mt="md">
-            <Button type="submit">Save</Button>
+            <Button
+               type="submit"
+               disabled={isLoading}
+               leftSection={
+                  isLoading ? <Loader size="xs" color="white" /> : null
+               }>
+               Save
+            </Button>
          </Group>
       </form>
    )
