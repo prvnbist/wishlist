@@ -59,6 +59,7 @@ const AddSort = () => {
                comboboxProps={{ withinPortal: false }}
                onChange={value => setColumn(value as keyof Wish)}
                data={[
+                  { value: 'title', label: 'Title' },
                   { value: 'rating', label: 'Rating' },
                   { value: 'domain', label: 'Domain' },
                   { value: 'status', label: 'Status' },

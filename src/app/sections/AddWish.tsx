@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { AxiosError } from 'axios'
-import { useMutation, useQueryClient } from 'react-query'
+import { useQueryClient } from 'react-query'
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone'
 import {
    IconPhoto,
@@ -33,8 +32,9 @@ import { DateInput } from '@mantine/dates'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 
+import { Wish } from '@/types'
 import { isURL } from '@/utils'
-import { addWish } from '@/queries'
+import { addWish } from '@/actions'
 
 const AddWish = () => {
    const [opened, { open, close }] = useDisclosure(false)
@@ -108,6 +108,7 @@ const Form = ({
 }) => {
    const queryClient = useQueryClient()
 
+   const [isSaving, setIsSaving] = useState(false)
    const [files, setFiles] = useState<FileWithPath[]>([])
 
    const previews = files.map((file, index) => {
@@ -121,20 +122,6 @@ const Form = ({
             onLoad={() => URL.revokeObjectURL(imageUrl)}
          />
       )
-   })
-
-   const { mutate, isLoading } = useMutation({
-      mutationFn: addWish,
-      onError: error => {
-         notifications.show({
-            title: 'Error',
-            message: (error as AxiosError).message,
-         })
-      },
-      onSuccess: () => {
-         queryClient.invalidateQueries('wishes')
-         onSave()
-      },
    })
 
    const form = useForm({
@@ -163,11 +150,34 @@ const Form = ({
          }),
       }),
    })
+
+   const save = async (values: any) => {
+      setIsSaving(true)
+      try {
+         const form = new FormData()
+         for (let key in values) {
+            if (values[key]) {
+               form.append(key, values[key])
+            }
+         }
+
+         form.append('file', files?.[0])
+
+         await addWish(form)
+
+         queryClient.invalidateQueries('wishes')
+         onSave()
+      } catch (error) {
+         notifications.show({
+            title: 'Error',
+            message: (error as Error).message,
+         })
+      } finally {
+         setIsSaving(false)
+      }
+   }
    return (
-      <form
-         onSubmit={form.onSubmit(values =>
-            mutate({ ...values, file: files?.[0] })
-         )}>
+      <form onSubmit={form.onSubmit(values => save(values))}>
          <Stack>
             <Stack gap={4}>
                <Input.Label>Title</Input.Label>
@@ -283,9 +293,9 @@ const Form = ({
          <Group justify="flex-end" mt="md">
             <Button
                type="submit"
-               disabled={isLoading}
+               disabled={isSaving}
                leftSection={
-                  isLoading ? <Loader size="xs" color="white" /> : null
+                  isSaving ? <Loader size="xs" color="white" /> : null
                }>
                Save
             </Button>

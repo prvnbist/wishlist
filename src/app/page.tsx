@@ -1,12 +1,11 @@
 'use client'
 
-import { AxiosError } from 'axios'
 import { useQuery } from 'react-query'
 
 import { notifications } from '@mantine/notifications'
 import { Center, Container, Group, Loader } from '@mantine/core'
 
-import { wishes } from '@/queries'
+import { wishes } from '@/actions'
 import useGlobalStore from '@/lib/zustand'
 
 import { AddSort, AddWish, Results, Search, Sorts } from './sections'
@@ -22,7 +21,7 @@ function Home() {
          onError: error => {
             notifications.show({
                title: 'Error',
-               message: (error as AxiosError).message,
+               message: (error as Error).message,
             })
          },
       }
@@ -41,7 +40,7 @@ function Home() {
                <Loader />
             </Center>
          ) : (
-            <Results data={query.data ?? []} />
+            <Results data={query?.data?.wishes ?? []} />
          )}
       </Container>
    )

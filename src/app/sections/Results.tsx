@@ -25,7 +25,7 @@ import {
 import { notifications } from '@mantine/notifications'
 
 import type { Wish } from '@/types'
-import { deleteWish } from '@/queries'
+import { deleteWish } from '@/actions'
 import { calculatePercentDifference, currencyFormatter } from '@/utils'
 
 const columnHelper = createColumnHelper<Wish>()
@@ -182,7 +182,7 @@ const RowActions = ({ row }: { row: Row<Wish> }) => {
       onError: error => {
          notifications.show({
             title: 'Error',
-            message: (error as AxiosError).message,
+            message: (error as Error).message,
          })
       },
       onSuccess: () => {
