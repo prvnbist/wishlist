@@ -49,8 +49,16 @@ export default function RootLayout({
    return (
       <html lang="en">
          <head>
-            <title>Wishlist</title>
             <ColorSchemeScript defaultColorScheme="dark" />
+
+            <title>Wishlist</title>
+            <meta property="description" content="Manages your wishes." />
+
+            <meta property="og:title" content="Wishlist" />
+            <meta property="og:description" content="Manages your wishes." />
+
+            <meta property="twitter:title" content="Wishlist" />
+            <meta property="twitter:card" content="Manages your wishes." />
          </head>
          <body className={inter.className}>
             <QueryClientProvider client={queryClient}>
